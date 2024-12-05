@@ -10,8 +10,18 @@ type userType = {
   email: string;
   followers: [];
   following: [];
+  post: postType[];
   profileImage: string;
 }[];
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardFooter,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 const Page = () => {
   const [users, setUsers] = useState<userType>([]);
   console.log(users);
@@ -27,16 +37,25 @@ const Page = () => {
     getUser();
   }, []);
   return (
+    // <div>
+    //   {" "}
+    //   {users?.map((user) => {
+    //     return (
+    //       <div key={user._id}>
+    //         {" "}
+    //         <div>{user.userName}</div>
+    //       </div>
+    //     );
+    //   })}{" "}
+    // </div>
     <div>
-      {" "}
-      {users?.map((user) => {
-        return (
-          <div key={user._id}>
-            {" "}
-            <div>{user.userName}</div>
-          </div>
-        );
-      })}{" "}
+      <div>
+        {" "}
+        <Avatar>
+          <AvatarImage src="https://github.com/shadcn.png" alt="@shadcn" />
+          <AvatarFallback>CN</AvatarFallback>
+        </Avatar>
+      </div>
     </div>
   );
 };
