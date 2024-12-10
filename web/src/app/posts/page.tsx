@@ -34,6 +34,7 @@ import {
   CarouselPrevious,
 } from "@/components/ui/carousel";
 import { Heart, Send, MessageSquare, Bookmark } from "lucide-react";
+import { useRouter } from "next/navigation";
 
 const page = () => {
   const [posts, setPosts] = useState<postType>([]);
@@ -51,6 +52,7 @@ const page = () => {
 
     getPost();
   }, []);
+  const router = useRouter();
   console.log(posts);
   if (loading === true) {
     return (
@@ -62,17 +64,19 @@ const page = () => {
     );
   }
   return (
-    <div>
+    <div className="bg-black">
       <div>
         {posts?.map((post) => {
           return (
-            <div key={post._id}>
-              <div className="flex items-center gap-2 p-1">
+            <div key={post._id} className="mt-3 bg-black">
+              <div className="flex items-center gap-2 p-2">
                 <Avatar>
                   <AvatarImage src={post.user.profileImage} alt="@shadcn" />
                   <AvatarFallback>CN</AvatarFallback>
                 </Avatar>
-                <div className="text-xs">{post.user.userName}</div>
+                <div className="text-[14px] text-white">
+                  {post.user.userName}
+                </div>
               </div>
               <div>
                 <Carousel className="max-w-[500px] max-h-[9000px]">
@@ -86,37 +90,45 @@ const page = () => {
                     })}
                   </CarouselContent>
                   <CarouselPrevious />
-
-                  <CarouselNext className="z-10 sticky" />
                 </Carousel>
               </div>
               <div className="p-2">
                 <div className="flex justify-between">
-                  <div className="flex gap-2">
+                  <div className="flex gap-3 p-1">
                     <button>
-                      <Heart color="red" />
+                      <Heart color="white" />
                     </button>
                     <button>
-                      <MessageSquare />
+                      <MessageSquare color="white" />
                     </button>
                     <button>
-                      <Send />
+                      <Send color="white" />
                     </button>
                   </div>
-                  <div>
+                  <div className="p-1">
                     <button>
                       {" "}
-                      <Bookmark />
+                      <Bookmark color="white" />
                     </button>
                   </div>
                 </div>
-                <div className="font-bold">12k likes</div>
+                <div className="font-bold text-white">12k likes</div>
                 <div className="flex gap-2">
-                  <div className="font-bold">{post.user.userName}</div>{" "}
-                  <div className="font-thin"> {post.description}</div>
+                  <div className="font-bold text-white">
+                    {post.user.userName}
+                  </div>{" "}
+                  <div className="font-thin text-white">
+                    {" "}
+                    {post.description}
+                  </div>
+                </div>
+                <div
+                  className="text-white"
+                  onClick={() => router.push(`posts/comments/${post._id}`)}
+                >
+                  view all comments
                 </div>
               </div>
-              <div className="h-screen">as</div>
             </div>
           );
         })}
