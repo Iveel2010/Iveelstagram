@@ -29,12 +29,19 @@ type commentType = {
   };
 }[];
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { Input } from "@/components/ui/input";
 const Page = ({ params }: { params: Promise<{ postId: string }> }) => {
   const [comments, setComments] = useState<commentType>([]);
   const { postId } = use(params);
   const getPost = async () => {
     const jsonData = await fetch(
-      `https://instagram-server-2phx.onrender.com/getComment/${postId}`
+      `https://instagram-server-2phx.onrender.com/getComment/${postId}`,
+      {
+        headers: {
+          authorization: `Bearer ${token}`,
+          // "content/type": "application/json",
+        },
+      }
     );
     const response = await jsonData.json();
     setComments(response.comments);
@@ -68,6 +75,7 @@ const Page = ({ params }: { params: Promise<{ postId: string }> }) => {
           );
         })}
       </div>
+      <Input className="text-white fixed bottom-0" />
     </div>
   );
 };
