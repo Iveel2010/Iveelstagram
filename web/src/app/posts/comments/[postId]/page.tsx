@@ -35,13 +35,7 @@ const Page = ({ params }: { params: Promise<{ postId: string }> }) => {
   const { postId } = use(params);
   const getPost = async () => {
     const jsonData = await fetch(
-      `https://instagram-server-2phx.onrender.com/getComment/${postId}`,
-      {
-        headers: {
-          authorization: `Bearer ${token}`,
-          // "content/type": "application/json",
-        },
-      }
+      `https://instagram-server-2phx.onrender.com/getComment/${postId}`
     );
     const response = await jsonData.json();
     setComments(response.comments);

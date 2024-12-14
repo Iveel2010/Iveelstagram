@@ -1,6 +1,6 @@
 "use client";
 import * as React from "react";
-
+import { useState, useEffect } from "react";
 import {
   Card,
   CardContent,
@@ -35,6 +35,7 @@ const page = () => {
   const [email, setEmail] = React.useState<string>("");
   const [password, setPassword] = React.useState<string>("");
   const [userName, setUserName] = React.useState<string>("");
+  const [newUser, setNewUser] = React.useState<string>("");
 
   const [one, setOne] = React.useState<boolean>(false);
   const [two, setTwo] = React.useState<boolean>(false);
@@ -51,7 +52,6 @@ const page = () => {
   };
 
   const onButton = () => {
-    console.log(email);
     if (email === "") {
       setOne(true);
     }
@@ -70,7 +70,28 @@ const page = () => {
     if (password !== "") {
       setThree(false);
     }
-    console.log(one);
+    postNewUser();
+  };
+
+  const postNewUser = async () => {
+    const newBro = {
+      userName,
+      password,
+      email,
+    };
+    const jsonData = await fetch(
+      `https://instagram-server-2phx.onrender.com/signup`,
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(newBro),
+      }
+    );
+    const response = await jsonData.json();
+    console.log(response.token);
+    localStorage.setItem("token", response.token);
   };
 
   return (

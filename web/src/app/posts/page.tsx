@@ -37,22 +37,48 @@ import { Heart, Send, MessageSquare, Bookmark } from "lucide-react";
 import { useRouter } from "next/navigation";
 
 const page = () => {
+  const router = useRouter();
   const [posts, setPosts] = useState<postType>([]);
   const [loading, setLoading] = useState<boolean>(false);
   const getPost = async () => {
-    const jsonData = await fetch(
-      "https://instagram-server-2phx.onrender.com/post"
-    );
-    const response = await jsonData.json();
-    setPosts(response);
-    setLoading(false);
+    const token = localStorage.getItem("token");
+
+    if (!token) {
+      router.push("/sign-up");
+      setLoading(false);
+    }
+
+    try {
+      const response = await fetch(
+        "https://instagram-server-2phx.onrender.com/post",
+        {
+          method: "GET",
+          headers: {
+            authorization: `Bearer ${token}`,
+            "Content-Type": "application/json",
+          },
+        }
+      );
+
+      if (!response.ok) {
+        throw new Error(`Failed to fetch posts: ${response.statusText}`);
+      }
+
+      const jsonData = await response.json();
+      setPosts(jsonData);
+      setLoading(false);
+    } catch (error) {
+      console.log(error);
+      setLoading(false);
+    }
   };
+
   useEffect(() => {
     setLoading(true);
 
     getPost();
   }, []);
-  const router = useRouter();
+
   console.log(posts);
   if (loading === true) {
     return (
