@@ -42,7 +42,17 @@ const page = () => {
   const [loading, setLoading] = useState<boolean>(false);
   const getPost = async () => {
     const token = localStorage.getItem("token");
+    const handleSubmit = (e: React.FormEvent) => {
+      e.preventDefault();
 
+      console.log("Form Submitted", {
+        firstName,
+        lastName,
+        userName,
+        email,
+        password,
+      });
+    };
     if (!token) {
       router.push("/sign-up");
       setLoading(false);

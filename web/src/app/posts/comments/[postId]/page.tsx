@@ -1,5 +1,6 @@
 "use client";
 import { use, useEffect, useState } from "react";
+import { usePathname } from "next/navigation";
 type postType = {
   createdAt: string;
   updatedAt: string;
@@ -30,8 +31,14 @@ type commentType = {
 }[];
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Input } from "@/components/ui/input";
+import { Button } from "@/components/ui/button";
+import { Target } from "lucide-react";
 const Page = ({ params }: { params: Promise<{ postId: string }> }) => {
   const [comments, setComments] = useState<commentType>([]);
+  const [newCommentValue, setNewCommentValue] = useState<string>("");
+  const value = (e: { target: { value: string } }) => {
+    setNewCommentValue(e.target.value);
+  };
   const { postId } = use(params);
   const getPost = async () => {
     const jsonData = await fetch(
@@ -69,7 +76,12 @@ const Page = ({ params }: { params: Promise<{ postId: string }> }) => {
           );
         })}
       </div>
-      <Input className="text-white fixed bottom-0" />
+      <div className="text-white flex w-full fixed bottom-0 ">
+        <Input onChange={value} placeholder="Add a comment" />
+        {newCommentValue !== "" ? (
+          <Button className="max-h-full bg-black text-blue-600">post</Button>
+        ) : null}
+      </div>
     </div>
   );
 };
