@@ -1,5 +1,25 @@
 "use client";
 import { useState, useEffect } from "react";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { Card, CardContent } from "@/components/ui/card";
+import {
+  Carousel,
+  CarouselContent,
+  CarouselItem,
+  CarouselNext,
+  CarouselPrevious,
+} from "@/components/ui/carousel";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
+import { Heart, Send, MessageSquare, Bookmark } from "lucide-react";
+import { useRouter } from "next/navigation";
+import { jwtDecode } from "jwt-decode";
 type postType = {
   createdAt: string;
   updatedAt: string;
@@ -24,38 +44,19 @@ type commentType = {
   comment: string;
   userId: string;
 }[];
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { Card, CardContent } from "@/components/ui/card";
-import {
-  Carousel,
-  CarouselContent,
-  CarouselItem,
-  CarouselNext,
-  CarouselPrevious,
-} from "@/components/ui/carousel";
-import { Heart, Send, MessageSquare, Bookmark } from "lucide-react";
-import { useRouter } from "next/navigation";
 
 const page = () => {
   const router = useRouter();
   const [posts, setPosts] = useState<postType>([]);
   const [loading, setLoading] = useState<boolean>(false);
-  const getPost = async () => {
-    const token = localStorage.getItem("token");
-    const handleSubmit = (e: React.FormEvent) => {
-      e.preventDefault();
+  const token = localStorage.getItem("token");
 
-      console.log("Form Submitted", {
-        firstName,
-        lastName,
-        userName,
-        email,
-        password,
-      });
-    };
+  const decoded = jwtDecode(token || "");
+  const userId = decoded.userId;
+
+  const getPost = async () => {
     if (!token) {
       router.push("/sign-up");
-      setLoading(false);
     }
 
     try {
@@ -75,6 +76,7 @@ const page = () => {
       }
 
       const jsonData = await response.json();
+      console.log(jsonData);
       setPosts(jsonData);
       setLoading(false);
     } catch (error) {
@@ -83,9 +85,27 @@ const page = () => {
     }
   };
 
+  const onLike = async ({ postId }: { postId: string }) => {
+    console.log(postId);
+    const likeReg = {
+      postId,
+      userId,
+    };
+    const jsonData = await fetch(
+      "https://instagram-server-2phx.onrender.com/like",
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(likeReg),
+      }
+    );
+    const response = await jsonData.json();
+    console.log("Server Response:", response);
+  };
   useEffect(() => {
     setLoading(true);
-
     getPost();
   }, []);
 
@@ -104,7 +124,7 @@ const page = () => {
       <div>
         {posts?.map((post) => {
           return (
-            <div key={post._id} className="mt-3 bg-black">
+            <div key={post._id} className="pt-3 bg-black">
               <div className="flex items-center gap-2 p-2">
                 <Avatar>
                   <AvatarImage src={post.user.profileImage} alt="@shadcn" />
@@ -132,10 +152,18 @@ const page = () => {
                 <div className="flex justify-between">
                   <div className="flex gap-3 p-1">
                     <button>
-                      <Heart color="white" />
+                      <Heart
+                        color="white"
+                        onClick={() => onLike({ postId: post._id })}
+                      />
                     </button>
                     <button>
-                      <MessageSquare color="white" />
+                      <MessageSquare
+                        color="white"
+                        onClick={() =>
+                          router.push(`posts/comments/${post._id}`)
+                        }
+                      />
                     </button>
                     <button>
                       <Send color="white" />
@@ -148,7 +176,25 @@ const page = () => {
                     </button>
                   </div>
                 </div>
-                <div className="font-bold text-white">12k likes</div>
+                <Dialog>
+                  <DialogTrigger className="font-bold text-white">
+                    {post.likes.length}
+                  </DialogTrigger>
+                  <DialogContent>
+                    <DialogHeader>
+                      <DialogTitle>Liked peoples</DialogTitle>
+                      {post.likes.map((like, index) => {
+                        console.log(like);
+                        return (
+                          <DialogDescription key={index}>
+                            {like}
+                          </DialogDescription>
+                        );
+                      })}
+                    </DialogHeader>
+                  </DialogContent>
+                </Dialog>
+
                 <div className="flex gap-2">
                   <div className="font-bold text-white">
                     {post.user.userName}

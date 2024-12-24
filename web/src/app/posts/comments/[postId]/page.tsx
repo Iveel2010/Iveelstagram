@@ -1,6 +1,18 @@
 "use client";
 import { use, useEffect, useState } from "react";
-import { usePathname } from "next/navigation";
+import { jwtDecode } from "jwt-decode";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { Input } from "@/components/ui/input";
+import { Button } from "@/components/ui/button";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
+
 type postType = {
   createdAt: string;
   updatedAt: string;
@@ -29,10 +41,6 @@ type commentType = {
     profileImage: string;
   };
 }[];
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { Input } from "@/components/ui/input";
-import { Button } from "@/components/ui/button";
-import { Target } from "lucide-react";
 const Page = ({ params }: { params: Promise<{ postId: string }> }) => {
   const [comments, setComments] = useState<commentType>([]);
   const [newCommentValue, setNewCommentValue] = useState<string>("");
@@ -40,6 +48,7 @@ const Page = ({ params }: { params: Promise<{ postId: string }> }) => {
     setNewCommentValue(e.target.value);
   };
   const { postId } = use(params);
+
   const getPost = async () => {
     const jsonData = await fetch(
       `https://instagram-server-2phx.onrender.com/getComment/${postId}`
@@ -48,6 +57,48 @@ const Page = ({ params }: { params: Promise<{ postId: string }> }) => {
     setComments(response.comments);
     console.log(response.comments);
   };
+
+  const newComment = async () => {
+    const HOOK_HIDDEN_CODE = "Uj10321651";
+    const storedToken = localStorage.getItem("token");
+
+    if (!storedToken) {
+      console.error("No token found in localStorage");
+      return;
+    }
+
+    try {
+      const decoded = jwtDecode(storedToken);
+      console.log(decoded);
+      console.log(postId);
+      console.log(comments);
+      const newBro = {
+        comment: newCommentValue,
+        userId: decoded.userId,
+        postId,
+      };
+
+      const jsonData = await fetch(
+        "https://instagram-server-2phx.onrender.com/comment",
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(newBro),
+        }
+      );
+      const response = await jsonData.json();
+      console.log("Server Response:", response);
+    } catch (error) {
+      console.log("Error during token verification or fetching data:", error);
+    }
+  };
+
+  const createComment = () => {
+    newComment();
+  };
+
   useEffect(() => {
     getPost();
   }, []);
@@ -79,7 +130,12 @@ const Page = ({ params }: { params: Promise<{ postId: string }> }) => {
       <div className="text-white flex w-full fixed bottom-0 ">
         <Input onChange={value} placeholder="Add a comment" />
         {newCommentValue !== "" ? (
-          <Button className="max-h-full bg-black text-blue-600">post</Button>
+          <Button
+            onClick={createComment}
+            className="max-h-full bg-black text-blue-600"
+          >
+            post
+          </Button>
         ) : null}
       </div>
     </div>
