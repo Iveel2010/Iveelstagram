@@ -9,6 +9,7 @@ import {
   CarouselNext,
   CarouselPrevious,
 } from "@/components/ui/carousel";
+
 import {
   Dialog,
   DialogContent,
@@ -85,25 +86,61 @@ const page = () => {
     }
   };
 
-  const onLike = async ({ postId }: { postId: string }) => {
+  const onLike = async ({
+    postId,
+    likes,
+  }: {
+    postId: string;
+    likes: string[];
+  }) => {
+    if (!userId) {
+      console.error("User ID is not defined.");
+      return;
+    }
+
+    if (likes.includes(userId)) {
+      console.log("hi");
+    }
+
     console.log(postId);
+
     const likeReg = {
       postId,
       userId,
     };
-    const jsonData = await fetch(
-      "https://instagram-server-2phx.onrender.com/like",
-      {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(likeReg),
+
+    try {
+      const jsonData = await fetch(
+        "https://instagram-server-2phx.onrender.com/like",
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(likeReg),
+        }
+      );
+
+      if (!jsonData.ok) {
+        throw new Error(`Server error: ${jsonData.statusText}`);
       }
-    );
-    const response = await jsonData.json();
-    console.log("Server Response:", response);
+
+      const response = await jsonData.json();
+      console.log("Server Response:", response);
+
+      if (response.success) {
+        console.log("Post liked successfully!");
+      } else {
+        console.log(
+          "Failed to like the post",
+          response.message || response.error
+        );
+      }
+    } catch (error) {
+      console.error("Error liking post:", error);
+    }
   };
+
   useEffect(() => {
     setLoading(true);
     getPost();
@@ -154,7 +191,9 @@ const page = () => {
                     <button>
                       <Heart
                         color="white"
-                        onClick={() => onLike({ postId: post._id })}
+                        onClick={() =>
+                          onLike({ postId: post._id }, { likes: post.likes })
+                        }
                       />
                     </button>
                     <button>
