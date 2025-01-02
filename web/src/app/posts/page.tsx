@@ -37,7 +37,7 @@ type likeType = {
   _id: string;
   postId: string;
   userId: string;
-}[];
+};
 type commentType = {
   createdAt: string;
   updatedAt: string;
@@ -48,18 +48,21 @@ type commentType = {
 
 const page = () => {
   const router = useRouter();
+  const [ifUserLikedBro, setIfUserLikedBro] = useState<boolean>(false);
   const [posts, setPosts] = useState<postType>([]);
   const [loading, setLoading] = useState<boolean>(false);
   const token = localStorage.getItem("token");
 
-  const decoded = jwtDecode(token || "");
+  const decoded: { userId: string } = jwtDecode(token || "");
   const userId = decoded.userId;
 
   const getPost = async () => {
     if (!token) {
       router.push("/sign-up");
     }
-
+    if (token) {
+      router.push("/posts");
+    }
     try {
       const response = await fetch(
         "https://instagram-server-2phx.onrender.com/post",
@@ -85,25 +88,21 @@ const page = () => {
       setLoading(false);
     }
   };
-
   const onLike = async ({
     postId,
     likes,
   }: {
     postId: string;
-    likes: string[];
+    likes: likeType[];
   }) => {
+    const ifUserLiked = likes.includes(userId);
+    setIfUserLikedBro(ifUserLiked);
+    console.log(ifUserLiked);
     if (!userId) {
       console.error("User ID is not defined.");
       return;
     }
-
-    if (likes.includes(userId)) {
-      console.log("hi");
-    }
-
     console.log(postId);
-
     const likeReg = {
       postId,
       userId,
@@ -190,9 +189,10 @@ const page = () => {
                   <div className="flex gap-3 p-1">
                     <button>
                       <Heart
-                        color="white"
+                        color={ifUserLikedBro === true ? "red" : "white"}
+                        fill={ifUserLikedBro === true ? "red" : "black"}
                         onClick={() =>
-                          onLike({ postId: post._id }, { likes: post.likes })
+                          onLike({ postId: post._id, likes: post.likes })
                         }
                       />
                     </button>
@@ -210,14 +210,14 @@ const page = () => {
                   </div>
                   <div className="p-1">
                     <button>
-                      {" "}
                       <Bookmark color="white" />
                     </button>
                   </div>
                 </div>
                 <Dialog>
                   <DialogTrigger className="font-bold text-white">
-                    {post.likes.length}
+                    {post.likes.length}{" "}
+                    {post.likes.length > 1 ? "likes" : "like"}
                   </DialogTrigger>
                   <DialogContent>
                     <DialogHeader>
@@ -226,7 +226,7 @@ const page = () => {
                         console.log(like);
                         return (
                           <DialogDescription key={index}>
-                            {like}
+                            {like.userId}
                           </DialogDescription>
                         );
                       })}

@@ -50,9 +50,11 @@ const Page = () => {
     // </div>
     <div>
       <div>
-        {" "}
         <Avatar>
-          <AvatarImage src="https://github.com/shadcn.png" alt="@shadcn" />
+          <AvatarImage
+            src="https://upload.wikimedia.org/wikipedia/en/thumb/5/57/KFC_logo-image.svg/640px-KFC_logo-image.svg.png"
+            alt="@kfc"
+          />
           <AvatarFallback>CN</AvatarFallback>
         </Avatar>
       </div>

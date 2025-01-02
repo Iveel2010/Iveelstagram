@@ -121,7 +121,7 @@ const Page = ({ params }: { params: Promise<{ postId: string }> }) => {
                     {comment.userId.userName}
                   </div>
                 </div>{" "}
-                <div className="text-white">{comment.comment}</div>
+                <div className="text-white ">{comment.comment}</div>
               </div>
             </div>
           );
