@@ -17,12 +17,28 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
-import { Heart, Send, MessageSquare, Bookmark, Home, Search, PlusSquare, User, Sun, Moon, Cog } from "lucide-react";
+import {
+  Heart,
+  Send,
+  MessageSquare,
+  Bookmark,
+  Home,
+  Search,
+  PlusSquare,
+  User,
+  Sun,
+  Moon,
+  Cog,
+} from "lucide-react";
 import { useRouter } from "next/navigation";
-import {jwtDecode} from "jwt-decode";
-import { DropdownMenu, DropdownMenuTrigger, DropdownMenuContent, DropdownMenuItem } from "@/components/ui/dropdown-menu";
-import { Button } from "@/components/ui/button"; 
-
+import { jwtDecode } from "jwt-decode";
+import {
+  DropdownMenu,
+  DropdownMenuTrigger,
+  DropdownMenuContent,
+  DropdownMenuItem,
+} from "@/components/ui/dropdown-menu";
+import { Button } from "@/components/ui/button";
 
 type postType = {
   createdAt: string;
@@ -94,7 +110,6 @@ const Page = () => {
       const response = await fetch(
         "https://instagram-server-2phx.onrender.com/post",
         {
-          method: "GET",
           headers: {
             authorization: `Bearer ${token}`,
             "Content-Type": "application/json",
@@ -184,7 +199,13 @@ const Page = () => {
   }
 
   return (
-    <div className={isDarkMode ? "bg-black min-h-screen text-white" : "bg-white min-h-screen text-black"}>
+    <div
+      className={
+        isDarkMode
+          ? "bg-black min-h-screen text-white"
+          : "bg-white min-h-screen text-black"
+      }
+    >
       <header className="flex justify-between items-center px-4 py-2 border-b">
         <h1 className="text-xl font-bold">Iveelstagram</h1>
         <div className="flex items-center space-x-4">
@@ -233,7 +254,9 @@ const Page = () => {
         {posts?.map((post) => (
           <div
             key={post._id}
-            className={`border-b border-gray-700 mb-6 animate-fade-in ${isDarkMode ? "bg-black" : "bg-white"}`}
+            className={`border-b border-gray-700 mb-6 animate-fade-in ${
+              isDarkMode ? "bg-black" : "bg-white"
+            }`}
           >
             <div className="flex items-center gap-3 p-3">
               <Avatar className="w-10 h-10">
@@ -268,13 +291,15 @@ const Page = () => {
               <div className="flex justify-between items-center">
                 <div className="flex gap-4">
                   <button
-                    onClick={() => onLike({ postId: post._id, likes: post.likes })}
+                    onClick={() =>
+                      onLike({ postId: post._id, likes: post.likes })
+                    }
                     className="hover:scale-125 transition-transform duration-300"
                   >
                     <Heart
-                      className={`w-6 h-6 ${ifUserLikedBro ? "text-red-500" : "text--500"} ${
-                        isDarkMode ? "dark:text-white" : "text-black"
-                      }`}
+                      className={`w-6 h-6 ${
+                        ifUserLikedBro ? "text-red-500" : "text--500"
+                      } ${isDarkMode ? "dark:text-white" : "text-black"}`}
                       fill={ifUserLikedBro ? "red" : "transparent"}
                     />
                   </button>
@@ -286,7 +311,10 @@ const Page = () => {
                     <MessageSquare className="w-6 h-6" />
                   </button>
                   <button className="hover:scale-125 transition-transform duration-300">
-                    <Send className="w-6 h-6" />
+                    <Send
+                      onClick={() => router.push(`/posts/comments/${post._id}`)}
+                      className="w-6 h-6"
+                    />
                   </button>
                 </div>
                 <div>
@@ -312,9 +340,44 @@ const Page = () => {
                 </DialogContent>
               </Dialog>
             </div>
+            <button
+              onClick={() => router.push(`/posts/comments/${post._id}`)}
+              className={`w-full flex items-center justify-start px-3 font-bold`}
+            >
+              View all {post.comments.length}{" "}
+              {post.comments.length > 1 ? "comments" : "comment"}
+            </button>
+            <input
+              className={`pb-3 px-3  ${isDarkMode ? "bg-black" : "bg-white"}`}
+              type="text"
+              placeholder="Add a comment..."
+            />
           </div>
         ))}
       </div>
+      <footer>
+        <div
+          className={`w-full flex items-center p-2 bottom-0 fixed  justify-around ${
+            isDarkMode ? "bg-black" : "bg-white"
+          }`}
+        >
+          <button className="hover:scale-125 transition-transform duration-300">
+            <Home className="w-6 h-6 cursor-pointer" />
+          </button>
+          <button className="hover:scale-125 transition-transform duration-300">
+            <Search className="w-6 h-6 cursor-pointer" />
+          </button>
+          <button className="hover:scale-125 transition-transform duration-300">
+            <PlusSquare className="w-6 h-6 cursor-pointer" />
+          </button>
+          <button className="hover:scale-125 transition-transform duration-300">
+            <Heart className="w-6 h-6 cursor-pointer" />
+          </button>
+          <button className="hover:scale-125 transition-transform duration-300">
+            <User className="w-6 h-6 cursor-pointer" />
+          </button>
+        </div>
+      </footer>
     </div>
   );
 };

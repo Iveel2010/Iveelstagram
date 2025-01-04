@@ -4,6 +4,7 @@ import { jwtDecode } from "jwt-decode";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
+import { useParams } from "next/navigation";
 
 type postType = {
   createdAt: string;
@@ -40,7 +41,7 @@ const Page = ({ params }: { params: Promise<{ postId: string }> }) => {
   const value = (e: { target: { value: string } }) => {
     setNewCommentValue(e.target.value);
   };
-  const { postId } = use(params);
+  const { postId } = useParams();
 
   const getPost = async () => {
     const jsonData = await fetch(
@@ -53,11 +54,6 @@ const Page = ({ params }: { params: Promise<{ postId: string }> }) => {
 
   const newComment = async () => {
     const storedToken = localStorage.getItem("token");
-
-    if (!storedToken) {
-      console.error("No token found in localStorage");
-      return;
-    }
 
     try {
       const decoded = jwtDecode(storedToken);
@@ -78,11 +74,10 @@ const Page = ({ params }: { params: Promise<{ postId: string }> }) => {
         }
       );
       const response = await jsonData.json();
-      console.log("Server Response:", response);
       setNewCommentValue("");
       getPost();
     } catch (error) {
-      console.log("Error during token verification or fetching data:", error);
+      console.log(error);
     }
   };
 
@@ -108,9 +103,7 @@ const Page = ({ params }: { params: Promise<{ postId: string }> }) => {
                   <div className="text-sm font-bold text-white">
                     {comment.userId.userName}
                   </div>
-                  <div className="text-sm text-gray-400">
-                    {comment.comment}
-                  </div>
+                  <div className="text-sm text-gray-400">{comment.comment}</div>
                 </div>
               </div>
             </div>
