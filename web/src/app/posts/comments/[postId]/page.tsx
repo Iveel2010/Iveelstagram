@@ -1,17 +1,9 @@
 "use client";
-import { use, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { jwtDecode } from "jwt-decode";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger,
-} from "@/components/ui/dialog";
 
 type postType = {
   createdAt: string;
@@ -41,6 +33,7 @@ type commentType = {
     profileImage: string;
   };
 }[];
+
 const Page = ({ params }: { params: Promise<{ postId: string }> }) => {
   const [comments, setComments] = useState<commentType>([]);
   const [newCommentValue, setNewCommentValue] = useState<string>("");
@@ -59,7 +52,6 @@ const Page = ({ params }: { params: Promise<{ postId: string }> }) => {
   };
 
   const newComment = async () => {
-    const HOOK_HIDDEN_CODE = "Uj10321651";
     const storedToken = localStorage.getItem("token");
 
     if (!storedToken) {
@@ -69,9 +61,6 @@ const Page = ({ params }: { params: Promise<{ postId: string }> }) => {
 
     try {
       const decoded = jwtDecode(storedToken);
-      console.log(decoded);
-      console.log(postId);
-      console.log(comments);
       const newBro = {
         comment: newCommentValue,
         userId: decoded.userId,
@@ -90,53 +79,58 @@ const Page = ({ params }: { params: Promise<{ postId: string }> }) => {
       );
       const response = await jsonData.json();
       console.log("Server Response:", response);
+      setNewCommentValue("");
+      getPost();
     } catch (error) {
       console.log("Error during token verification or fetching data:", error);
     }
   };
 
-  const createComment = () => {
-    newComment();
-  };
-
   useEffect(() => {
     getPost();
   }, []);
+
   return (
-    <div className="bg-black h-screen w-full">
-      <div className="pt-10">
+    <div className="bg-gray-900 h-screen w-full flex flex-col items-center">
+      <div className="pt-10 w-full max-w-md">
         {comments.map((comment, index) => {
           return (
-            <div key={index}>
-              <div className="flex items-center gap-2 p-2 mb-2">
-                <div className="flex items-center gap-2 ">
-                  <Avatar>
-                    <AvatarImage
-                      src={comment.userId.profileImage}
-                      alt="@shadcn"
-                    />
-                    <AvatarFallback>CN</AvatarFallback>
-                  </Avatar>
-                  <div className="text-white font-bold">
+            <div key={index} className="p-4 border-b border-gray-800">
+              <div className="flex items-start gap-4">
+                <Avatar>
+                  <AvatarImage
+                    src={comment.userId.profileImage}
+                    alt={comment.userId.userName}
+                  />
+                  <AvatarFallback>CN</AvatarFallback>
+                </Avatar>
+                <div className="flex-1">
+                  <div className="text-sm font-bold text-white">
                     {comment.userId.userName}
                   </div>
-                </div>{" "}
-                <div className="text-white ">{comment.comment}</div>
+                  <div className="text-sm text-gray-400">
+                    {comment.comment}
+                  </div>
+                </div>
               </div>
             </div>
           );
         })}
       </div>
-      <div className="text-white flex w-full fixed bottom-0 ">
-        <Input onChange={value} placeholder="Add a comment" />
-        {newCommentValue !== "" ? (
-          <Button
-            onClick={createComment}
-            className="max-h-full bg-black text-blue-600"
-          >
-            post
-          </Button>
-        ) : null}
+      <div className="w-full max-w-md fixed bottom-0 flex items-center gap-2 p-4 bg-gray-800">
+        <Input
+          onChange={value}
+          value={newCommentValue}
+          placeholder="Add a comment..."
+          className="flex-1 bg-gray-700 text-white placeholder-gray-400"
+        />
+        <Button
+          onClick={newComment}
+          disabled={!newCommentValue}
+          className="bg-blue-600 text-white hover:bg-blue-500 disabled:bg-gray-500"
+        >
+          Post
+        </Button>
       </div>
     </div>
   );

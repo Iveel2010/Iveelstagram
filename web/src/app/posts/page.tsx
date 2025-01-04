@@ -9,7 +9,6 @@ import {
   CarouselNext,
   CarouselPrevious,
 } from "@/components/ui/carousel";
-
 import {
   Dialog,
   DialogContent,
@@ -18,9 +17,13 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
-import { Heart, Send, MessageSquare, Bookmark } from "lucide-react";
+import { Heart, Send, MessageSquare, Bookmark, Home, Search, PlusSquare, User, Sun, Moon, Cog } from "lucide-react";
 import { useRouter } from "next/navigation";
-import { jwtDecode } from "jwt-decode";
+import {jwtDecode} from "jwt-decode";
+import { DropdownMenu, DropdownMenuTrigger, DropdownMenuContent, DropdownMenuItem } from "@/components/ui/dropdown-menu";
+import { Button } from "@/components/ui/button"; 
+
+
 type postType = {
   createdAt: string;
   updatedAt: string;
@@ -31,6 +34,7 @@ type postType = {
   likes: likeType[];
   comments: commentType[];
 }[];
+
 type likeType = {
   createdAt: string;
   updatedAt: string;
@@ -38,6 +42,7 @@ type likeType = {
   postId: string;
   userId: string;
 };
+
 type commentType = {
   createdAt: string;
   updatedAt: string;
@@ -46,15 +51,37 @@ type commentType = {
   userId: string;
 }[];
 
-const page = () => {
+const Page = () => {
   const router = useRouter();
   const [ifUserLikedBro, setIfUserLikedBro] = useState<boolean>(false);
   const [posts, setPosts] = useState<postType>([]);
   const [loading, setLoading] = useState<boolean>(false);
   const token = localStorage.getItem("token");
+  const [isDarkMode, setIsDarkMode] = useState<boolean>(false);
 
   const decoded: { userId: string } = jwtDecode(token || "");
   const userId = decoded.userId;
+
+  const toggleDarkMode = () => {
+    setIsDarkMode(!isDarkMode);
+  };
+
+  useEffect(() => {
+    if (isDarkMode) {
+      document.documentElement.classList.add("dark");
+      localStorage.setItem("theme", "dark");
+    } else {
+      document.documentElement.classList.remove("dark");
+      localStorage.setItem("theme", "light");
+    }
+  }, [isDarkMode]);
+
+  useEffect(() => {
+    const savedTheme = localStorage.getItem("theme");
+    if (savedTheme === "dark") {
+      setIsDarkMode(true);
+    }
+  }, []);
 
   const getPost = async () => {
     if (!token) {
@@ -88,6 +115,7 @@ const page = () => {
       setLoading(false);
     }
   };
+
   const onLike = async ({
     postId,
     likes,
@@ -95,14 +123,14 @@ const page = () => {
     postId: string;
     likes: likeType[];
   }) => {
-    const ifUserLiked = likes.includes(userId);
+    const ifUserLiked = likes.some((like) => like.userId === userId);
     setIfUserLikedBro(ifUserLiked);
-    console.log(ifUserLiked);
+
     if (!userId) {
       console.error("User ID is not defined.");
       return;
     }
-    console.log(postId);
+
     const likeReg = {
       postId,
       userId,
@@ -145,7 +173,6 @@ const page = () => {
     getPost();
   }, []);
 
-  console.log(posts);
   if (loading === true) {
     return (
       <div className="flex h-screen items-center justify-center">
@@ -155,106 +182,141 @@ const page = () => {
       </div>
     );
   }
-  return (
-    <div className="bg-black">
-      <div>
-        {posts?.map((post) => {
-          return (
-            <div key={post._id} className="pt-3 bg-black">
-              <div className="flex items-center gap-2 p-2">
-                <Avatar>
-                  <AvatarImage src={post.user.profileImage} alt="@shadcn" />
-                  <AvatarFallback>CN</AvatarFallback>
-                </Avatar>
-                <div className="text-[14px] text-white">
-                  {post.user.userName}
-                </div>
-              </div>
-              <div>
-                <Carousel className="max-w-[500px] max-h-[9000px]">
-                  <CarouselContent>
-                    {post.postImage?.map((postImages, index) => {
-                      return (
-                        <CarouselItem key={index}>
-                          <img src={postImages} />
-                        </CarouselItem>
-                      );
-                    })}
-                  </CarouselContent>
-                  <CarouselPrevious />
-                </Carousel>
-              </div>
-              <div className="p-2">
-                <div className="flex justify-between">
-                  <div className="flex gap-3 p-1">
-                    <button>
-                      <Heart
-                        color={ifUserLikedBro === true ? "red" : "white"}
-                        fill={ifUserLikedBro === true ? "red" : "black"}
-                        onClick={() =>
-                          onLike({ postId: post._id, likes: post.likes })
-                        }
-                      />
-                    </button>
-                    <button>
-                      <MessageSquare
-                        color="white"
-                        onClick={() =>
-                          router.push(`posts/comments/${post._id}`)
-                        }
-                      />
-                    </button>
-                    <button>
-                      <Send color="white" />
-                    </button>
-                  </div>
-                  <div className="p-1">
-                    <button>
-                      <Bookmark color="white" />
-                    </button>
-                  </div>
-                </div>
-                <Dialog>
-                  <DialogTrigger className="font-bold text-white">
-                    {post.likes.length}{" "}
-                    {post.likes.length > 1 ? "likes" : "like"}
-                  </DialogTrigger>
-                  <DialogContent>
-                    <DialogHeader>
-                      <DialogTitle>Liked peoples</DialogTitle>
-                      {post.likes.map((like, index) => {
-                        console.log(like);
-                        return (
-                          <DialogDescription key={index}>
-                            {like.userId}
-                          </DialogDescription>
-                        );
-                      })}
-                    </DialogHeader>
-                  </DialogContent>
-                </Dialog>
 
-                <div className="flex gap-2">
-                  <div className="font-bold text-white">
-                    {post.user.userName}
-                  </div>{" "}
-                  <div className="font-thin text-white">
-                    {" "}
-                    {post.description}
-                  </div>
+  return (
+    <div className={isDarkMode ? "bg-black min-h-screen text-white" : "bg-white min-h-screen text-black"}>
+      <header className="flex justify-between items-center px-4 py-2 border-b">
+        <h1 className="text-xl font-bold">Iveelstagram</h1>
+        <div className="flex items-center space-x-4">
+          <button className="hover:scale-125 transition-transform duration-300">
+            <Home className="w-6 h-6 cursor-pointer" />
+          </button>
+          <button className="hover:scale-125 transition-transform duration-300">
+            <Search className="w-6 h-6 cursor-pointer" />
+          </button>
+          <button className="hover:scale-125 transition-transform duration-300">
+            <PlusSquare className="w-6 h-6 cursor-pointer" />
+          </button>
+          <button className="hover:scale-125 transition-transform duration-300">
+            <User className="w-6 h-6 cursor-pointer" />
+          </button>
+        </div>
+      </header>
+
+      <div className="container mx-auto px-4 py-6">
+        <div className="flex justify-end mb-4">
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button variant="outline" size="icon">
+                <Sun className="h-[1.2rem] w-[1.2rem] rotate-0 scale-100 transition-all dark:-rotate-90 dark:scale-0" />
+                <Moon className="absolute h-[1.2rem] w-[1.2rem] rotate-90 scale-0 transition-all dark:rotate-0 dark:scale-100" />
+                <span className="sr-only">Toggle theme</span>
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end">
+              <DropdownMenuItem onClick={() => setIsDarkMode(false)}>
+                <Sun className="mr-2 h-4 w-4" />
+                Гэрэлтэй
+              </DropdownMenuItem>
+              <DropdownMenuItem onClick={() => setIsDarkMode(true)}>
+                <Moon className="mr-2 h-4 w-4" />
+                Харанхүй
+              </DropdownMenuItem>
+              <DropdownMenuItem onClick={() => setIsDarkMode(false)}>
+                <Cog className="mr-2 h-4 w-4" />
+                Систем
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
+        </div>
+
+        {posts?.map((post) => (
+          <div
+            key={post._id}
+            className={`border-b border-gray-700 mb-6 animate-fade-in ${isDarkMode ? "bg-black" : "bg-white"}`}
+          >
+            <div className="flex items-center gap-3 p-3">
+              <Avatar className="w-10 h-10">
+                <AvatarImage
+                  src={post.user.profileImage}
+                  alt={post.user.userName}
+                />
+                <AvatarFallback>{post.user.userName[0]}</AvatarFallback>
+              </Avatar>
+              <div className="text-sm font-medium">{post.user.userName}</div>
+            </div>
+
+            <div className="max-w-[500px] mx-auto">
+              <Carousel className="overflow-hidden">
+                <CarouselContent>
+                  {post.postImage?.map((postImage, index) => (
+                    <CarouselItem key={index}>
+                      <img
+                        src={postImage}
+                        alt={`Post Image ${index + 1}`}
+                        className="w-full h-auto object-cover"
+                      />
+                    </CarouselItem>
+                  ))}
+                </CarouselContent>
+                <CarouselPrevious className="hover:text-gray-300" />
+                <CarouselNext className="hover:text-gray-300" />
+              </Carousel>
+            </div>
+
+            <div className="p-3">
+              <div className="flex justify-between items-center">
+                <div className="flex gap-4">
+                  <button
+                    onClick={() => onLike({ postId: post._id, likes: post.likes })}
+                    className="hover:scale-125 transition-transform duration-300"
+                  >
+                    <Heart
+                      className={`w-6 h-6 ${ifUserLikedBro ? "text-red-500" : "text--500"} ${
+                        isDarkMode ? "dark:text-white" : "text-black"
+                      }`}
+                      fill={ifUserLikedBro ? "red" : "transparent"}
+                    />
+                  </button>
+
+                  <button
+                    onClick={() => router.push(`posts/comments/${post._id}`)}
+                    className="hover:scale-125 transition-transform duration-300"
+                  >
+                    <MessageSquare className="w-6 h-6" />
+                  </button>
+                  <button className="hover:scale-125 transition-transform duration-300">
+                    <Send className="w-6 h-6" />
+                  </button>
                 </div>
-                <div
-                  className="text-white"
-                  onClick={() => router.push(`posts/comments/${post._id}`)}
-                >
-                  view all comments
+                <div>
+                  <button className="hover:scale-125 transition-transform duration-300">
+                    <Bookmark className="w-6 h-6" />
+                  </button>
                 </div>
               </div>
+
+              <Dialog>
+                <DialogTrigger className="text-sm font-semibold hover:underline">
+                  {post.likes.length} {post.likes.length > 1 ? "likes" : "like"}
+                </DialogTrigger>
+                <DialogContent>
+                  <DialogHeader>
+                    <DialogTitle>People who liked</DialogTitle>
+                    {post.likes.map((like, index) => (
+                      <DialogDescription key={index} className="text-gray-700">
+                        {like.userId}
+                      </DialogDescription>
+                    ))}
+                  </DialogHeader>
+                </DialogContent>
+              </Dialog>
             </div>
-          );
-        })}
+          </div>
+        ))}
       </div>
     </div>
   );
 };
-export default page;
+
+export default Page;
