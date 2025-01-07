@@ -74,7 +74,7 @@ const Page = () => {
   const [loading, setLoading] = useState<boolean>(false);
   const token = localStorage.getItem("token");
   const [isDarkMode, setIsDarkMode] = useState<boolean>(false);
-
+  const [isLightMode, setIsLightMode] = useState<boolean>(false);
   const decoded: { userId: string } = jwtDecode(token || "");
   const userId = decoded.userId;
 
@@ -83,15 +83,18 @@ const Page = () => {
   };
 
   useEffect(() => {
-    if (isDarkMode) {
+    if (isDarkMode === true) {
       document.documentElement.classList.add("dark");
       localStorage.setItem("theme", "dark");
-    } else {
+    }
+  }, [isDarkMode]);
+  useEffect(() => {
+    if (isLightMode === true) {
       document.documentElement.classList.remove("dark");
       localStorage.setItem("theme", "light");
     }
-  }, [isDarkMode]);
-
+  }, [isLightMode]);
+  
   useEffect(() => {
     const savedTheme = localStorage.getItem("theme");
     if (savedTheme === "dark") {
@@ -130,8 +133,15 @@ const Page = () => {
       setLoading(false);
     }
   };
-
-  const onLike = async ({
+  const LightOnclick = () => {
+    setIsDarkMode(false)
+    setIsLightMode(true)
+  }
+  const DarkOnclick = () => {
+    setIsDarkMode(true)
+    setIsLightMode(false)
+  }
+  const onLike = async ({ 
     postId,
     likes,
   }: {
@@ -235,18 +245,15 @@ const Page = () => {
               </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end">
-              <DropdownMenuItem onClick={() => setIsDarkMode(false)}>
+              <DropdownMenuItem onClick={() => LightOnclick()}>
                 <Sun className="mr-2 h-4 w-4" />
                 Гэрэлтэй
               </DropdownMenuItem>
-              <DropdownMenuItem onClick={() => setIsDarkMode(true)}>
+              <DropdownMenuItem onClick={() => DarkOnclick()}>
                 <Moon className="mr-2 h-4 w-4" />
                 Харанхүй
               </DropdownMenuItem>
-              <DropdownMenuItem onClick={() => setIsDarkMode(false)}>
-                <Cog className="mr-2 h-4 w-4" />
-                Систем
-              </DropdownMenuItem>
+
             </DropdownMenuContent>
           </DropdownMenu>
         </div>
@@ -374,12 +381,12 @@ const Page = () => {
             <Heart className="w-6 h-6 cursor-pointer" />
           </button>
           <button className="hover:scale-125 transition-transform duration-300">
-            <User className="w-6 h-6 cursor-pointer" />
+            <User onClick={() => router.push("/userProFile")} className="w-6 h-6 cursor-pointer" />
           </button>
         </div>
       </footer>
     </div>
-  );
+  );  
 };
 
 export default Page;

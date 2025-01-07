@@ -53,10 +53,10 @@ const Page = ({ params }: { params: Promise<{ postId: string }> }) => {
   };
 
   const newComment = async () => {
-    const storedToken = localStorage.getItem("token");
+    const token = localStorage.getItem("token");
 
     try {
-      const decoded = jwtDecode(storedToken);
+      const decoded = jwtDecode(token);
       const newBro = {
         comment: newCommentValue,
         userId: decoded.userId,

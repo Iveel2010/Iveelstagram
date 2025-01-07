@@ -144,7 +144,7 @@ const page = () => {
                   onChange={emailValue}
                   placeholder="Your Email"
                 />
-                {one === true ? <div>error</div> : null}
+                {one === true ? <div>Username is required</div> : null}
               </div>
               <div className="flex flex-col space-y-1.5">
                 <Label htmlFor="userName">Username</Label>
@@ -153,7 +153,7 @@ const page = () => {
                   onChange={userNameValue}
                   placeholder="Name of your profile"
                 />
-                {two === true ? <div>error</div> : null}
+                {two === true ? <div>Username is required</div> : null}
               </div>
               <div className="flex flex-col space-y-1.5">
                 <Label htmlFor="password">Password</Label>
@@ -162,7 +162,7 @@ const page = () => {
                   onChange={passwordValue}
                   placeholder="Your password"
                 />
-                {three === true ? <div>error</div> : null}
+                {three === true ? <div>Password is required</div> : null}
               </div>
             </div>
           </form>
