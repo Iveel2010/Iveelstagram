@@ -84,9 +84,6 @@ const page = () => {
     if (password !== "") {
       setThree(false);
     }
-    if (password !== "") {
-      setThree(false);
-    }
     if (email !== "") {
       if (userName !== "") {
         if (password !== "") {
