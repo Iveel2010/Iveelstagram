@@ -94,7 +94,7 @@ const Page = () => {
       localStorage.setItem("theme", "light");
     }
   }, [isLightMode]);
-  
+
   useEffect(() => {
     const savedTheme = localStorage.getItem("theme");
     if (savedTheme === "dark") {
@@ -134,14 +134,14 @@ const Page = () => {
     }
   };
   const LightOnclick = () => {
-    setIsDarkMode(false)
-    setIsLightMode(true)
-  }
+    setIsDarkMode(false);
+    setIsLightMode(true);
+  };
   const DarkOnclick = () => {
-    setIsDarkMode(true)
-    setIsLightMode(false)
-  }
-  const onLike = async ({ 
+    setIsDarkMode(true);
+    setIsLightMode(false);
+  };
+  const onLike = async ({
     postId,
     likes,
   }: {
@@ -253,7 +253,6 @@ const Page = () => {
                 <Moon className="mr-2 h-4 w-4" />
                 Харанхүй
               </DropdownMenuItem>
-
             </DropdownMenuContent>
           </DropdownMenu>
         </div>
@@ -381,12 +380,15 @@ const Page = () => {
             <Heart className="w-6 h-6 cursor-pointer" />
           </button>
           <button className="hover:scale-125 transition-transform duration-300">
-            <User onClick={() => router.push("/userProFile")} className="w-6 h-6 cursor-pointer" />
+            <User
+              onClick={() => router.push("/userProFile")}
+              className="w-6 h-6 cursor-pointer"
+            />
           </button>
         </div>
       </footer>
     </div>
-  );  
+  );
 };
 
 export default Page;
