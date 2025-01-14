@@ -2,6 +2,7 @@
 import { useState, useEffect } from "react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Card, CardContent } from "@/components/ui/card";
+import { CreatePost } from "@/components/createPost";
 import {
   Carousel,
   CarouselContent,
@@ -213,10 +214,14 @@ const Page = () => {
       className={
         isDarkMode
           ? "bg-black min-h-screen text-white"
-          : "bg-white min-h-screen text-black"
+          : "bg-gray-50 min-h-screen text-black"
       }
     >
-      <header className="flex justify-between items-center px-4 py-2 border-b">
+      <header    className={
+        isDarkMode
+          ? "flex justify-between items-center px-4 py-2 border-b bg-black shadow-md sticky top-0 z-50"
+          : "flex justify-between items-center px-4 py-2 border-b bg-white shadow-md sticky top-0 z-50"
+      } >
         <h1 className="text-xl font-bold">Iveelstagram</h1>
         <div className="flex items-center space-x-4">
           <button className="hover:scale-125 transition-transform duration-300">
@@ -261,7 +266,7 @@ const Page = () => {
           <div
             key={post._id}
             className={`border-b border-gray-700 mb-6 animate-fade-in ${
-              isDarkMode ? "bg-black" : "bg-white"
+              isDarkMode ? "bg-black" : "bg-gray-50"
             }`}
           >
             <div className="flex items-center gap-3 p-3">
@@ -330,11 +335,11 @@ const Page = () => {
                 </div>
               </div>
 
-              <Dialog>
+              <Dialog >
                 <DialogTrigger className="text-sm font-semibold hover:underline">
                   {post.likes.length} {post.likes.length > 1 ? "likes" : "like"}
                 </DialogTrigger>
-                <DialogContent>
+                <DialogContent className="bg-gray-50">
                   <DialogHeader>
                     <DialogTitle>People who liked</DialogTitle>
                     {post.likes.map((like, index) => (
@@ -374,7 +379,20 @@ const Page = () => {
             <Search className="w-6 h-6 cursor-pointer" />
           </button>
           <button className="hover:scale-125 transition-transform duration-300">
-            <PlusSquare className="w-6 h-6 cursor-pointer" />
+            <Dialog>
+      <DialogTrigger asChild>
+      <PlusSquare className="w-6 h-6 cursor-pointer" />
+      </DialogTrigger>
+      <DialogContent className="sm:max-w-[425px] h-auto transition-all duration-[2000ms] hover:max-w-[425px] hover:h-auto">
+        <DialogHeader>
+          <DialogTitle>Create post</DialogTitle>
+          <DialogDescription>
+            Make new posts to your profile here. Click post when you're done.
+          </DialogDescription>
+        </DialogHeader>
+        <CreatePost/>
+      </DialogContent>
+    </Dialog>
           </button>
           <button className="hover:scale-125 transition-transform duration-300">
             <Heart className="w-6 h-6 cursor-pointer" />
