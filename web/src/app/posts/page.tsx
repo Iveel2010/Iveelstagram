@@ -40,6 +40,7 @@ import {
   DropdownMenuItem,
 } from "@/components/ui/dropdown-menu";
 import { Button } from "@/components/ui/button";
+import Footer from "@/components/Footer";
 
 type postType = {
   createdAt: string;
@@ -149,48 +150,46 @@ const Page = () => {
     postId: string;
     likes: likeType[];
   }) => {
-    const ifUserLiked = likes.some((like) => like.userId === userId);
+    const ifUserLiked = likes.includes(userId);
     setIfUserLikedBro(ifUserLiked);
-
-    if (!userId) {
-      console.error("User ID is not defined.");
-      return;
-    }
 
     const likeReg = {
       postId,
       userId,
     };
 
-    try {
-      const jsonData = await fetch(
-        "https://instagram-server-2phx.onrender.com/like",
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify(likeReg),
-        }
-      );
-
-      if (!jsonData.ok) {
-        throw new Error(`Server error: ${jsonData.statusText}`);
-      }
-
-      const response = await jsonData.json();
-      console.log("Server Response:", response);
-
-      if (response.success) {
-        console.log("Post liked successfully!");
-      } else {
-        console.log(
-          "Failed to like the post",
-          response.message || response.error
+    if (ifUserLiked !== true) {
+      try {
+        const jsonData = await fetch(
+          "https://instagram-server-2phx.onrender.com/like",
+          {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify(likeReg),
+          }
         );
+        const response = await jsonData.json();
+      } catch (error) {
+        console.error("Error liking post:", error);
       }
-    } catch (error) {
-      console.error("Error liking post:", error);
+    } else {
+      try {
+        const jsonData = await fetch(
+          "https://instagram-server-2phx.onrender.com/unLike",
+          {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify(likeReg),
+          }
+        );
+        const response = await jsonData.json();
+      } catch (error) {
+        console.error("Error liking post:", error);
+      }
     }
   };
 
@@ -217,11 +216,13 @@ const Page = () => {
           : "bg-gray-50 min-h-screen text-black"
       }
     >
-      <header    className={
-        isDarkMode
-          ? "flex justify-between items-center px-4 py-2 border-b bg-black shadow-md sticky top-0 z-50"
-          : "flex justify-between items-center px-4 py-2 border-b bg-white shadow-md sticky top-0 z-50"
-      } >
+      <header
+        className={
+          isDarkMode
+            ? "flex justify-between items-center px-4 py-2 border-b bg-black shadow-md sticky top-0 z-50"
+            : "flex justify-between items-center px-4 py-2 border-b bg-white shadow-md sticky top-0 z-50"
+        }
+      >
         <h1 className="text-xl font-bold">Iveelstagram</h1>
         <div className="flex items-center space-x-4">
           <button className="hover:scale-125 transition-transform duration-300">
@@ -311,7 +312,6 @@ const Page = () => {
                       className={`w-6 h-6 ${
                         ifUserLikedBro ? "text-red-500" : "text--500"
                       } ${isDarkMode ? "dark:text-white" : "text-black"}`}
-                      fill={ifUserLikedBro ? "red" : "transparent"}
                     />
                   </button>
 
@@ -335,7 +335,7 @@ const Page = () => {
                 </div>
               </div>
 
-              <Dialog >
+              <Dialog>
                 <DialogTrigger className="text-sm font-semibold hover:underline">
                   {post.likes.length} {post.likes.length > 1 ? "likes" : "like"}
                 </DialogTrigger>
@@ -368,39 +368,54 @@ const Page = () => {
       </div>
       <footer>
         <div
-          className={`w-full flex items-center p-2 bottom-0 fixed  justify-around ${
+          className={`w-full flex items-center p-2 bottom-0 fixed justify-around ${
             isDarkMode ? "bg-black" : "bg-white"
           }`}
         >
           <button className="hover:scale-125 transition-transform duration-300">
-            <Home className="w-6 h-6 cursor-pointer" />
+            <Home
+              className="w-6 h-6 cursor-pointer"
+              color={isDarkMode ? "white" : "black"}
+              onClick={() => router.push("/posts")}
+            />
           </button>
           <button className="hover:scale-125 transition-transform duration-300">
-            <Search className="w-6 h-6 cursor-pointer" />
+            <Search
+              className="w-6 h-6 cursor-pointer"
+              color={isDarkMode ? "white" : "black"}
+            />
           </button>
           <button className="hover:scale-125 transition-transform duration-300">
             <Dialog>
-      <DialogTrigger asChild>
-      <PlusSquare className="w-6 h-6 cursor-pointer" />
-      </DialogTrigger>
-      <DialogContent className="sm:max-w-[425px] h-auto transition-all duration-[2000ms] hover:max-w-[425px] hover:h-auto">
-        <DialogHeader>
-          <DialogTitle>Create post</DialogTitle>
-          <DialogDescription>
-            Make new posts to your profile here. Click post when you're done.
-          </DialogDescription>
-        </DialogHeader>
-        <CreatePost/>
-      </DialogContent>
-    </Dialog>
+              <DialogTrigger asChild>
+                <PlusSquare
+                  className="w-6 h-6 cursor-pointer"
+                  color={isDarkMode ? "white" : "black"}
+                />
+              </DialogTrigger>
+              <DialogContent className="sm:max-w-[425px] h-auto transition-all duration-[2000ms] hover:max-w-[425px] hover:h-auto">
+                <DialogHeader>
+                  <DialogTitle>Create post</DialogTitle>
+                  <DialogDescription>
+                    Make new posts to your profile here. Click post when you're
+                    done.
+                  </DialogDescription>
+                </DialogHeader>
+                <CreatePost />
+              </DialogContent>
+            </Dialog>
           </button>
           <button className="hover:scale-125 transition-transform duration-300">
-            <Heart className="w-6 h-6 cursor-pointer" />
+            <Heart
+              className="w-6 h-6 cursor-pointer"
+              color={isDarkMode ? "white" : "black"}
+            />
           </button>
           <button className="hover:scale-125 transition-transform duration-300">
             <User
               onClick={() => router.push("/userProFile")}
               className="w-6 h-6 cursor-pointer"
+              color={isDarkMode ? "white" : "black"}
             />
           </button>
         </div>
