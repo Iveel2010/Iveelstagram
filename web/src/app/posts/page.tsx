@@ -2,6 +2,7 @@
 import { useState, useEffect } from "react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Card, CardContent } from "@/components/ui/card";
+import { CreatePost } from "@/components/createPost";
 import {
   Carousel,
   CarouselContent,
@@ -375,7 +376,20 @@ const Page = () => {
             <Search className="w-6 h-6 cursor-pointer" />
           </button>
           <button className="hover:scale-125 transition-transform duration-300">
-            <PlusSquare className="w-6 h-6 cursor-pointer" />
+            <Dialog>
+      <DialogTrigger asChild>
+      <PlusSquare className="w-6 h-6 cursor-pointer" />
+      </DialogTrigger>
+      <DialogContent className="sm:max-w-[425px]">
+        <DialogHeader>
+          <DialogTitle>Edit profile</DialogTitle>
+          <DialogDescription>
+            Make changes to your profile here. Click save when you're done.
+          </DialogDescription>
+        </DialogHeader>
+        <CreatePost/>
+      </DialogContent>
+    </Dialog>
           </button>
           <button className="hover:scale-125 transition-transform duration-300">
             <Heart className="w-6 h-6 cursor-pointer" />
